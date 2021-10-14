@@ -1,0 +1,25 @@
+---
+- name: install apache and php
+  hosts: webserver
+  become: yes
+  tasks:
+    - name:
+      package:
+        name: "{{ package }}"
+        state: present
+    - name: 
+      package:
+        name: "{{ package }}"
+        state: present
+    - name: create info.php
+      copy:
+        dest: "{{ info_php }}"
+        content: |
+          <?php
+          phpinfo();
+          ?>
+      notify: Restart apache
+  handlers:
+    name: "{{ package }}"
+
+    
