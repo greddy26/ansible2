@@ -26,8 +26,45 @@
         dest: "{{ tomcat_home }}"
     - name: create symblink
       file: 
-        path: /tmp/apache-tomcat-{{ tomcat_version }}.tar
-        group: tomcat
+        src: "{{ tomact_home }}/apache-tomcat-{{ tomcat_version }}"
+        dest: "{{ tomcat_home }}/latest"
+        state: link
+    - name: give ownership to tomcat user and group
+      file:
+        path: "{{ tomacat_ home }}"
+        state: directory
+        recurse: yes
+        owner: "{{ tomacat_ username }}"
+        group: "{{tomcat_username }}"
+    - name: find the all shell files in the binaries
+      find:
+        path: "{{ tomcat_home }}/latest/bin"
+        pattern: "*.sh"
+      register: shfiles
+    - set_fact: 
+        tomcat_executables: "{{shfiles.files | map(attributes='path') | list }}"
+    - name: change permission of shell files
+      file:
+        path: "{{ item }}"
         mode: 0751
+      with_items: "{{ tomcat_executables }}"
+    - name: create tomcat service file
+      copy: 
+        src: tomcat.service
+        dest: default/"{{ tomcat_service_dest }}"
+      notify:
+        - reload and enable tomcat       
+    - name: ensure tomcat is running
+      systemd:
+        name: tomcat.service
+        state: started
+  handlers:
+    - name: reload and enable tomcat
+      systemd:
+        name: tomcat.service
+        daemon_reload: yes
+        enable: yes
+        state: restarted
         
+
         
