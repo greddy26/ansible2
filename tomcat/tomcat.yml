@@ -1,0 +1,33 @@
+---
+- name: install and configure tomcat
+  hosts: appserver
+  become: yes
+  vars:
+    - default.ml
+  tasks:
+    - name: update package and install java
+      apt:
+        name: "{{ java_package}}"
+        update_cache: yes
+        state: present
+    - name: add a user tomcat
+      user:
+        name: "{{ tomcat_username}}"
+        shell: "{{ tomcat_shell}}"
+        home: "{{ tomcat_home }}"
+        state: present
+    - name: Download tomcat package
+      get_url: 
+        url: "https://www-eu.apache.org/dist/tomcat/tomcat-9/v{{ tomcat_version }}/bin/apache-tomcat-{{ tomcat_version }}.tar.gz"
+        dest: /tmp/apache-tomcat-{{ tomcat_version }}.tar.gz
+    - name: untar the package
+      unarchive:
+        src: /tmp/apache-tomcat-{{ tomcat_version }}.tar.gz
+        dest: "{{ tomcat_home }}"
+    - name: create symblink
+      file: 
+        path: /tmp/apache-tomcat-{{ tomcat_version }}.tar
+        group: tomcat
+        mode: 0751
+        
+        
