@@ -1,0 +1,21 @@
+---
+- name: update nginx package and install nopcommerce
+  hosts: webserver
+  become: yes
+  tasks:
+    - name: debian package and install 
+      get_url: 
+        url: https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
+        dest: /tmp/packages-microsoft-prod.deb
+    - name: install dpkg 
+      apt:
+        deb: /tmp/packages-microsoft-prod.deb
+    - name: instal dotnet and .netcore runtime
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+        state: present
+        with_items:
+          - apt-transport-https 
+          - aspnetcore-runtime-3.1
+        
