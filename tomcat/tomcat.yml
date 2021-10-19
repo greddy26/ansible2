@@ -22,6 +22,7 @@
       unarchive:
         src: "/tmp/apache-tomcat-{{ tomcat_version }}.tar.gz"
         dest: "{{ tomcat_home }}"
+        remote_src: yes
     - name: create symblink
       file:
         src: "{{ tomact_home }}/apache-tomcat-{{ tomcat_version }}"
