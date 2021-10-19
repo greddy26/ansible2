@@ -2,13 +2,6 @@
 - name: install and configure tomcat
   hosts: appserver
   become: yes
-  vars:
-    java_package: openjdk-11-jdk
-    tomcat_username: tomcat
-    tomcat_home: /opt/tomcat
-    tomcat_shell: /bin/false
-    tomcat_version: 9.0.54
-    tomcat_service_dest: /etc/systemd/system/tomcat.service
   tasks:
     - name: update package and install java
       apt:
@@ -63,6 +56,19 @@
       systemd:
         name: tomcat.service
         state: started
+    - name: copy tomcat user files
+      copy:
+        src: files/tomcat_user.xml
+        dest: "{{ tomcat_users_config_location }}"
+    - name: copy manager context files
+      copy:
+        src: files/manager_context.xml
+        dest: "{{ tomcat_manager_config_location }}"
+    - name: copy host context files
+      copy:
+        src: files/host_manager_context.xml
+        dest: "{{ tomcat_host_manager_config_location }}"
+      notify: reload and enable tomcat
   handlers:
     - name: reload and enable tomcat
       systemd:
