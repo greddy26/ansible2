@@ -3,11 +3,11 @@
   hosts: webserver
   become: yes
   tasks:
-    - name: debian package and install 
-      get_url: 
-        url: https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
+    - name: debian package and install
+      get_url:
+        url: https://packages.microsoft.com/service/ubuntu/20.04/packages-microsoft-prod.deb
         dest: /tmp/packages-microsoft-prod.deb
-    - name: install dpkg 
+    - name: install dpkg
       apt:
         deb: /tmp/packages-microsoft-prod.deb
     - name: instal dotnet and .netcore runtime
@@ -15,7 +15,70 @@
         name: "{{ item }}"
         update_cache: yes
         state: present
-        with_items:
-          - apt-transport-https 
-          - aspnetcore-runtime-3.1
-        
+      with_items:
+        - apt-transport-https
+        - aspnetcore-runtime-3.1
+    - name: install nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+      notify:
+        - restart nginx
+    - name: copy the nginx.service file
+      copy:
+        src: nginx.service
+        dest: /etc/nginx/sites-available/default
+    - name: create directory nopcommerce
+      copy:
+        path: /var/www/nopCommerce440
+        state: directory
+    - name: change directory
+      command:
+        chdir: /var/www/nopCommerce440
+    - name: download nopcommerce
+      get_url:
+        url: https://github.com/nopSolutions/nopCommerce/releases/download/release-4.40.4/nopCommerce_4.40.4_NoSource_linux_x64.zip
+        dest: /tmp/nopCommerce_4.40.4_NoSource_linux_x64.zip
+    - name: download unzip
+      apt:
+        name: unzip
+        state: present
+        update_cache: yes
+    - name: unzip nopcommerce
+      unarchive:
+        src: /tmp/nopCommerce_4.40.4_NoSource_linux_x64.zip
+        dest: /var/www/nopCommerce440
+        remote_src: yes
+    - name: create multiple directories
+      copy:
+        path:
+          - bin
+          - logs
+        state: directory
+    - name: change the group permissions
+      file:
+        path: /var/www
+        state: directory
+        recurse: yes
+        group: www-data
+        owner: www-data
+    - name: copy the nopcommerce.service file
+      copy:
+        src: nopcommerce.service
+        dest: /etc/systemd/system/nopCommerce440.service
+      notify:
+        - restart nopcommerce
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: started
+    - name: restart nopcommerce
+      service:
+        name: nopcommerce
+        state: started
