@@ -7,7 +7,7 @@
     tomcat_username: tomcat
     tomcat_home: /opt/tomcat
     tomcat_shell: /bin/false
-    tomcat_version: 9.0.35
+    tomcat_version: 9.0.54
     tomcat_service_dest: /etc/systemd/system/tomcat.service
   tasks:
     - name: update package and install java
