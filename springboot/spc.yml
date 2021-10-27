@@ -1,0 +1,39 @@
+---
+- name: Deploy sping boot application spc
+  become: yes
+  hosts: appserver
+  tasks:
+    - name: install java
+      apt:
+        name: openjdk-11-jdk
+        status: present
+        update_cache: yes
+    - name: download spc.jar file
+      get_url:
+        url: https://referenceapplicationskhaja.s3.us-west-2.amazonaws.com/spring-petclinic-2.4.2.jar
+        dest: /usr/share/spc/spring-petclinic.jar
+    - name: create user spc
+      user:
+        name: spc
+        state: present
+    - name: ownership of spc
+      file:
+        path: /usr/share/spc/spring-petclinic.jar
+        state: directory
+        recurse: yes
+        owner: spc
+    - name: change ownership and permission to spc
+      file:
+        path: /usr/share/spc/spring-petclinic.jar
+        owner: spc
+        group: spc
+        mode: 500
+    - name: copy file spc service
+      copy:
+        src: spc.service
+        dest: /etc/systemd/system/spc.service
+    - name: restart spc service
+      service:
+        name: restart spc.service
+        pattern: /etc/systemd/system/spc.service
+        state: started
