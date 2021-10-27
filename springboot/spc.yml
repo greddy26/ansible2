@@ -6,7 +6,7 @@
     - name: install java
       apt:
         name: openjdk-11-jdk
-        status: present
+        state: present
         update_cache: yes
     - name: download spc.jar file
       get_url:
