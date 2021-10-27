@@ -15,7 +15,7 @@
         mode: 500
     - name: download spc.jar file
       get_url:
-        url: https://referenceapplicationskhaja.s3.us-west-2.amazonaws.com/spring-petclinic-2.4.2.jar
+        url: "https://referenceapplicationskhaja.s3.us-west-2.amazonaws.com/spring-petclinic-2.4.2.jar"
         dest: /usr/share/spc/spring-petclinic.jar
     - name: create user spc
       user:
