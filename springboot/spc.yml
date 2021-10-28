@@ -10,30 +10,30 @@
   tasks:
     - name: install java
       apt:
-        name: { { "java_package" } }
+        name: /usr/share/spc/spring-petclinic.jar
         state: present
         update_cache: yes
     - name: create directory
       file:
-        path: { { "app_home" } }
+        path: /usr/share/spc/spring-petclinic.jar
         state: directory
     - name: download spc.jar file
       get_url:
         url: https://referenceapplicationskhaja.s3.us-west-2.amazonaws.com/spring-petclinic-2.4.2.jar
-        dest: { { "app_path" } }
+        dest: /usr/share/spc/spring-petclinic.jar
     - name: create user spc
       user:
         name: spc
         state: present
     - name: ownership of spc
       file:
-        path: { { "app_path" } }
+        path: /usr/share/spc/spring-petclinic.jar
         state: directory
         recurse: yes
         owner: spc
     - name: change ownership and permission to spc
       file:
-        path: { { "app_path" } }
+        path: /usr/share/spc/spring-petclinic.jar
         owner: spc
         group: spc
         mode: 500
